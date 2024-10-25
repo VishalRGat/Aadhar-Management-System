@@ -29,11 +29,6 @@ def to_excel(df):
         df.to_excel(writer, index=False, sheet_name='Aadhar Data')
     return output.getvalue()
 
-def to_pdf(df):
-    output = BytesIO()
-    df.to_csv(output, index=False)
-    return output.getvalue()
-
 # Aadhar Number Management System
 st.title("Aadhar Number Management System")
 
@@ -49,6 +44,7 @@ with st.sidebar:
 if menu_option == "Add Aadhar Number":
     # Update the text_input to reflect the current session state
     aadhar_number = st.text_input("Enter number here", value=st.session_state.aadhar_input, max_chars=12)
+    
     col1, col2 = st.columns(2)
     
     with col1:
@@ -66,8 +62,9 @@ if menu_option == "Add Aadhar Number":
     with col2:
         if st.button("Clear"):
             st.session_state.aadhar_input = ""  # Clear the session state input
-            # Update the text_input to reflect the cleared state
-            st.experimental_rerun()  # Rerun the script to update the input field
+
+# Update the text input with the cleared state
+st.text_input("Enter number here", value=st.session_state.aadhar_input, max_chars=12)
 
 # View all Aadhar numbers and export options
 elif menu_option == "View All Aadhar Numbers":
@@ -83,14 +80,6 @@ elif menu_option == "View All Aadhar Numbers":
         data=excel_data,
         file_name='aadhar_data.xlsx',
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
-
-    pdf_data = to_pdf(df)
-    st.download_button(
-        label="Download as PDF",
-        data=pdf_data,
-        file_name='aadhar_data.pdf',
-        mime="application/pdf"
     )
 
 # Closing database connection
