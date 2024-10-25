@@ -25,23 +25,18 @@ def get_all_aadhar():
 # Streamlit UI
 st.title("Aadhar Number Management System")
 
-# Search Aadhar number
-search_number = st.text_input("Search Aadhar Number:")
-if st.button("Search"):
-    result = check_aadhar(search_number)
-    if result:
-        st.success(f"Aadhar number {search_number} found in the database.")
-    else:
-        st.warning("Aadhar number not found.")
+# Input Aadhar number (single bar for search and add)
+aadhar_number = st.text_input("Enter Aadhar Number (12-digit)")
 
-# Input and submit Aadhar number
-aadhar_number = st.text_input("Enter new Aadhar Number:")
 if st.button("Submit"):
-    if check_aadhar(aadhar_number):
-        st.info("Aadhar number already exists. Please enter a new number.")
+    if not aadhar_number.isdigit() or len(aadhar_number) != 12:
+        st.error("Invalid Aadhar number! Please enter a 12-digit numeric Aadhar number.")
     else:
-        add_aadhar(aadhar_number)
-        st.success("Aadhar number added successfully.")
+        if check_aadhar(aadhar_number):
+            st.info(f"Aadhar number {aadhar_number} already exists in the database.")
+        else:
+            add_aadhar(aadhar_number)
+            st.success("Aadhar number added successfully.")
 
 # Display all Aadhar numbers
 st.header("All Submitted Aadhar Numbers")
