@@ -29,6 +29,11 @@ def to_excel(df):
         df.to_excel(writer, index=False, sheet_name='Aadhar Data')
     return output.getvalue()
 
+def to_pdf(df):
+    output = BytesIO()
+    df.to_csv(output, index=False)
+    return output.getvalue()
+
 # Aadhar Number Management System
 st.title("Aadhar Number Management System")
 
@@ -42,29 +47,17 @@ with st.sidebar:
 
 # Aadhar number input
 if menu_option == "Add Aadhar Number":
-    # Update the text_input to reflect the current session state
-    aadhar_number = st.text_input("Enter number here", value=st.session_state.aadhar_input, max_chars=12)
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        if st.button("Submit"):
-            if not aadhar_number.isdigit() or len(aadhar_number) != 12:
-                st.error("Invalid Aadhar number! Please enter exactly 12 numeric digits.")
+    aadhar_number = st.text_input("Enter number here", value=st.session_state.aadhar_input, max_chars=12)  # Title updated
+    if st.button("Submit"):
+        if not aadhar_number.isdigit() or len(aadhar_number) != 12:
+            st.error("Invalid Aadhar number! Please enter exactly 12 numeric digits.")
+        else:
+            if check_aadhar(aadhar_number):
+                st.info(f"Aadhar number {aadhar_number} already exists in the database.")
             else:
-                if check_aadhar(aadhar_number):
-                    st.info(f"Aadhar number {aadhar_number} already exists in the database.")
-                else:
-                    add_aadhar(aadhar_number)
-                    st.success("Aadhar number added successfully.")
-                    st.session_state.aadhar_input = ""  # Clear input field after submission
-
-    with col2:
-        if st.button("Clear"):
-            st.session_state.aadhar_input = ""  # Clear the session state input
-
-# Update the text input with the cleared state
-st.text_input("Enter number here", value=st.session_state.aadhar_input, max_chars=12)
+                add_aadhar(aadhar_number)
+                st.success("Aadhar number added successfully.")
+                st.session_state.aadhar_input = ""  # Clear input field after submission
 
 # View all Aadhar numbers and export options
 elif menu_option == "View All Aadhar Numbers":
@@ -80,6 +73,14 @@ elif menu_option == "View All Aadhar Numbers":
         data=excel_data,
         file_name='aadhar_data.xlsx',
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+
+    pdf_data = to_pdf(df)
+    st.download_button(
+        label="Download as PDF",
+        data=pdf_data,
+        file_name='aadhar_data.pdf',
+        mime="application/pdf"
     )
 
 # Closing database connection
