@@ -1,6 +1,7 @@
 import streamlit as st
 import sqlite3
 import pandas as pd
+from io import BytesIO
 
 # Database connection
 conn = sqlite3.connect("aadhar_db.sqlite")
@@ -48,19 +49,34 @@ data = get_all_aadhar()
 df = pd.DataFrame(data, columns=["Aadhar Number"])
 st.dataframe(df)
 
+# Function to convert DataFrame to Excel in memory
+def to_excel(df):
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+        df.to_excel(writer, index=False, sheet_name='Aadhar Data')
+    return output.getvalue()
+
+# Function to convert DataFrame to PDF (using CSV as a workaround)
+def to_pdf(df):
+    output = BytesIO()
+    df.to_csv(output, index=False)
+    return output.getvalue()
+
 # Export data options
+excel_data = to_excel(df)
 st.download_button(
     label="Download as Excel",
-    data=df.to_excel(index=False, engine='xlsxwriter'),
+    data=excel_data,
     file_name='aadhar_data.xlsx',
     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 )
 
+pdf_data = to_pdf(df)
 st.download_button(
     label="Download as PDF",
-    data=df.to_csv(index=False).encode("utf-8"),  # Adjusted for PDF export workaround with CSV data
-    file_name='aadhar_data.csv',
-    mime="application/csv"
+    data=pdf_data,
+    file_name='aadhar_data.pdf',
+    mime="application/pdf"
 )
 
 # Closing database connection
