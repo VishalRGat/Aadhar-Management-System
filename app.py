@@ -37,48 +37,20 @@ def to_pdf(df):
 # Aadhar Number Management System
 st.title("Aadhar Number Management System")
 
+# Initialize session state for aadhar input if not already done
+if 'aadhar_input' not in st.session_state:
+    st.session_state.aadhar_input = ""
+
 # Sidebar menu
 with st.sidebar:
     menu_option = st.radio("Menu", ["Add Aadhar Number", "View All Aadhar Numbers"])
 
 # Aadhar number input
 if menu_option == "Add Aadhar Number":
-    aadhar_number = st.text_input("Enter number here", max_chars=12, key="aadhar_input")  # Title updated
+    aadhar_number = st.text_input("Enter number here", value=st.session_state.aadhar_input, max_chars=12)  # Title updated
     if st.button("Submit"):
         if not aadhar_number.isdigit() or len(aadhar_number) != 12:
             st.error("Invalid Aadhar number! Please enter exactly 12 numeric digits.")
         else:
             if check_aadhar(aadhar_number):
-                st.info(f"Aadhar number {aadhar_number} already exists in the database.")
-            else:
-                add_aadhar(aadhar_number)
-                st.success("Aadhar number added successfully.")
-                st.session_state.aadhar_input = ""  # Clear input field after submission
-
-# View all Aadhar numbers and export options
-elif menu_option == "View All Aadhar Numbers":
-    st.header("All Submitted Aadhar Numbers")
-    data = get_all_aadhar()
-    df = pd.DataFrame(data, columns=["Aadhar Number"])
-    st.dataframe(df)
-
-    # Export options
-    excel_data = to_excel(df)
-    st.download_button(
-        label="Download as Excel",
-        data=excel_data,
-        file_name='aadhar_data.xlsx',
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
-
-    pdf_data = to_pdf(df)
-    st.download_button(
-        label="Download as PDF",
-        data=pdf_data,
-        file_name='aadhar_data.pdf',
-        mime="application/pdf"
-    )
-
-# Closing database connection
-st.stop()
-conn.close()
+                
