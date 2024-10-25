@@ -47,7 +47,8 @@ with st.sidebar:
 
 # Aadhar number input
 if menu_option == "Add Aadhar Number":
-    aadhar_number = st.text_input("Enter number here", value=st.session_state.aadhar_input, max_chars=12)  # Title updated
+    # Update the text_input to reflect the current session state
+    aadhar_number = st.text_input("Enter number here", value=st.session_state.aadhar_input, max_chars=12)
     col1, col2 = st.columns(2)
     
     with col1:
@@ -64,7 +65,9 @@ if menu_option == "Add Aadhar Number":
 
     with col2:
         if st.button("Clear"):
-            st.session_state.aadhar_input = ""  # Clear the input field
+            st.session_state.aadhar_input = ""  # Clear the session state input
+            # Update the text_input to reflect the cleared state
+            st.experimental_rerun()  # Rerun the script to update the input field
 
 # View all Aadhar numbers and export options
 elif menu_option == "View All Aadhar Numbers":
