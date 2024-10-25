@@ -48,16 +48,23 @@ with st.sidebar:
 # Aadhar number input
 if menu_option == "Add Aadhar Number":
     aadhar_number = st.text_input("Enter number here", value=st.session_state.aadhar_input, max_chars=12)  # Title updated
-    if st.button("Submit"):
-        if not aadhar_number.isdigit() or len(aadhar_number) != 12:
-            st.error("Invalid Aadhar number! Please enter exactly 12 numeric digits.")
-        else:
-            if check_aadhar(aadhar_number):
-                st.info(f"Aadhar number {aadhar_number} already exists in the database.")
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        if st.button("Submit"):
+            if not aadhar_number.isdigit() or len(aadhar_number) != 12:
+                st.error("Invalid Aadhar number! Please enter exactly 12 numeric digits.")
             else:
-                add_aadhar(aadhar_number)
-                st.success("Aadhar number added successfully.")
-                st.session_state.aadhar_input = ""  # Clear input field after submission
+                if check_aadhar(aadhar_number):
+                    st.info(f"Aadhar number {aadhar_number} already exists in the database.")
+                else:
+                    add_aadhar(aadhar_number)
+                    st.success("Aadhar number added successfully.")
+                    st.session_state.aadhar_input = ""  # Clear input field after submission
+
+    with col2:
+        if st.button("Clear"):
+            st.session_state.aadhar_input = ""  # Clear the input field
 
 # View all Aadhar numbers and export options
 elif menu_option == "View All Aadhar Numbers":
