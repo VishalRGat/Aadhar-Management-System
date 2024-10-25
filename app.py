@@ -34,25 +34,51 @@ def to_pdf(df):
     df.to_csv(output, index=False)
     return output.getvalue()
 
-# Initialize session state for login
-if 'logged_in' not in st.session_state:
-    st.session_state.logged_in = False
+# Aadhar Number Management System
+st.title("Aadhar Number Management System")
 
-# Login page
-if not st.session_state.logged_in:
-    st.title("Login")
-    email = st.text_input("Email")
-    password = st.text_input("Password", type="password")
-    if st.button("Login"):
-        if email == "admin@example.com" and password == "password123":
-            st.session_state.logged_in = True
-            st.success("Login successful!")
+# Sidebar menu
+with st.sidebar:
+    menu_option = st.radio("Menu", ["Add Aadhar Number", "View All Aadhar Numbers"])
+
+# Aadhar number input
+if menu_option == "Add Aadhar Number":
+    aadhar_number = st.text_input("Enter Aadhar Number (12-digit)")
+    if st.button("Submit"):
+        if not aadhar_number.isdigit() or len(aadhar_number) != 12:
+            st.error("Invalid Aadhar number! Please enter a 12-digit numeric Aadhar number.")
         else:
-            st.error("Invalid email or password.")
-else:
-    # Aadhar Number Management System
-    st.title("Aadhar Number Management System")
-    
-    # Sidebar menu
-    with st.sidebar:
-        menu_option = st.r
+            if check_aadhar(aadhar_number):
+                st.info(f"Aadhar number {aadhar_number} already exists in the database.")
+            else:
+                add_aadhar(aadhar_number)
+                st.success("Aadhar number added successfully.")
+                st.text_input("Enter Aadhar Number (12-digit)", value="", key="reset")  # Reset input
+
+# View all Aadhar numbers and export options
+elif menu_option == "View All Aadhar Numbers":
+    st.header("All Submitted Aadhar Numbers")
+    data = get_all_aadhar()
+    df = pd.DataFrame(data, columns=["Aadhar Number"])
+    st.dataframe(df)
+
+    # Export options
+    excel_data = to_excel(df)
+    st.download_button(
+        label="Download as Excel",
+        data=excel_data,
+        file_name='aadhar_data.xlsx',
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+
+    pdf_data = to_pdf(df)
+    st.download_button(
+        label="Download as PDF",
+        data=pdf_data,
+        file_name='aadhar_data.pdf',
+        mime="application/pdf"
+    )
+
+# Closing database connection
+st.stop()
+conn.close()
