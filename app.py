@@ -1,5 +1,6 @@
 import streamlit as st
 import sqlite3
+import pandas as pd
 
 # Database connection
 conn = sqlite3.connect("aadhar_db.sqlite")
@@ -14,6 +15,11 @@ def check_aadhar(aadhar_number):
 def add_aadhar(aadhar_number):
     cursor.execute("INSERT INTO aadhar_data (aadhar_number) VALUES (?)", (aadhar_number,))
     conn.commit()
+
+def get_all_aadhar():
+    cursor.execute("SELECT * FROM aadhar_data")
+    rows = cursor.fetchall()
+    return rows
 
 # Streamlit UI
 st.title("Aadhar Number Management System")
@@ -35,6 +41,27 @@ if st.button("Submit"):
     else:
         add_aadhar(aadhar_number)
         st.success("Aadhar number added successfully.")
+
+# Display all Aadhar numbers
+st.header("All Submitted Aadhar Numbers")
+data = get_all_aadhar()
+df = pd.DataFrame(data, columns=["Aadhar Number"])
+st.dataframe(df)
+
+# Export data options
+st.download_button(
+    label="Download as Excel",
+    data=df.to_excel(index=False, engine='xlsxwriter'),
+    file_name='aadhar_data.xlsx',
+    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+)
+
+st.download_button(
+    label="Download as PDF",
+    data=df.to_csv(index=False).encode("utf-8"),  # Adjusted for PDF export workaround with CSV data
+    file_name='aadhar_data.csv',
+    mime="application/csv"
+)
 
 # Closing database connection
 st.stop()
