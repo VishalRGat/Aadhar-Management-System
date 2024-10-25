@@ -53,4 +53,35 @@ if menu_option == "Add Aadhar Number":
             st.error("Invalid Aadhar number! Please enter exactly 12 numeric digits.")
         else:
             if check_aadhar(aadhar_number):
-                
+                st.info(f"Aadhar number {aadhar_number} already exists in the database.")
+            else:
+                add_aadhar(aadhar_number)
+                st.success("Aadhar number added successfully.")
+                st.session_state.aadhar_input = ""  # Clear input field after submission
+
+# View all Aadhar numbers and export options
+elif menu_option == "View All Aadhar Numbers":
+    st.header("All Submitted Aadhar Numbers")
+    data = get_all_aadhar()
+    df = pd.DataFrame(data, columns=["Aadhar Number"])
+    st.dataframe(df)
+
+    # Export options
+    excel_data = to_excel(df)
+    st.download_button(
+        label="Download as Excel",
+        data=excel_data,
+        file_name='aadhar_data.xlsx',
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+
+    pdf_data = to_pdf(df)
+    st.download_button(
+        label="Download as PDF",
+        data=pdf_data,
+        file_name='aadhar_data.pdf',
+        mime="application/pdf"
+    )
+
+# Closing database connection
+conn.close()
